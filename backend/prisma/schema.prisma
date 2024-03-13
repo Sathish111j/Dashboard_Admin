@@ -17,8 +17,8 @@ model Mentor {
 
 model Student {
   id          Int      @id @default(autoincrement())
-  mentorId    Int
-  mentor      Mentor   @relation(fields: [mentorId], references: [id])
+  mentorId    Int?
+  mentor      Mentor?  @relation(fields: [mentorId], references: [id])
   name        String
   email       String   @unique
   ideation    Float?

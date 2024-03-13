@@ -10,36 +10,41 @@ const app = new Hono<{
 }>();
 app.use("/*", cors());
 
-
 // Getting assigned students of mentor
 
-app.post("/mentors/students", async (c) => {
-  const { mentorId } = await c.req.json();
-
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate());
-
-  const mentor = await prisma.mentor.findUnique({
-    where: { id: Number(mentorId) },
-    include: { students: true },
-  });
-
-  return c.json(mentor?.students || []);
-});
-
-
 // Assigning mentors to students.
-
 app.post("/mentors/assign", async (c) => {
   const { mentorId, studentId } = await c.req.json();
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
+
+  // Check if the mentor already has 4 students
+  const mentor = await prisma.mentor.findUnique({
+    where: { id: Number(mentorId) },
+    include: { students: true },
+  });
+
+  if (mentor && mentor.students.length >= 4) {
+    c.status(400);
+    return c.json({ error: "Mentor can't accommodate more students." });
+  }
+
+  // Check if the mentor already has the student assigned
+  const alreadyAssigned = mentor?.students.find(
+    (student: { id: number }) => student.id === Number(studentId)
+  );
+  if (alreadyAssigned) {
+    c.status(400);
+    return c.json({ error: "Student is already assigned to this mentor." });
+  }
+
+  // Assign the student to the mentor
   const updatedStudent = await prisma.student.update({
     where: { id: Number(studentId) },
     data: { mentorId: Number(mentorId) },
   });
+
   return c.json(updatedStudent);
 });
 
@@ -52,11 +57,10 @@ app.post("/mentors/unassign", async (c) => {
   }).$extends(withAccelerate());
   const updatedStudent = await prisma.student.update({
     where: { id: Number(studentId) },
-    data: { mentorId: null },
+    data: { mentorId: null || undefined },
   });
   return c.json(updatedStudent);
 });
-
 
 // Updating marks for students.
 
@@ -88,9 +92,9 @@ app.post("/students/marks", async (c) => {
 app.get("/students/unassigned", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
+  }).$extends(withAccelerate());
   const unassignedStudents = await prisma.student.findMany({
-    where: { mentorId: null },
+    where: { mentorId: null || undefined },
   });
   return c.json(unassignedStudents);
 });
@@ -100,7 +104,7 @@ app.post("/students/totalMarks", async (c) => {
   const { studentId } = await c.req.json();
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate())
+  }).$extends(withAccelerate());
   const student = await prisma.student.findUnique({
     where: { id: Number(studentId) },
     select: { totalMarks: true },
@@ -109,7 +113,7 @@ app.post("/students/totalMarks", async (c) => {
 });
 
 //add mentors
-app.post('/mentors', async (c) => {
+app.post("/mentors", async (c) => {
   const { name, email } = await c.req.json();
 
   const prisma = new PrismaClient({
@@ -128,8 +132,8 @@ app.post('/mentors', async (c) => {
 
 // add students
 
-app.post('/students', async (c) => {
-  const { name, email } = await c.req.json(); 
+app.post("/students", async (c) => {
+  const body = await c.req.json();
 
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
@@ -137,14 +141,44 @@ app.post('/students', async (c) => {
 
   const student = await prisma.student.create({
     data: {
-      name,
-      email,
+      name: body.name,
+      email: body.email,
+      mentorId: body.mentorId || null,
     },
   });
 
   return c.json(student);
 });
 
+// Endpoint to fetch all mentors and their associated students with all details
+app.get("/mentors/all", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const mentors = await prisma.mentor.findMany({
+      include: {
+        students: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            ideation: true,
+            execution: true,
+            viva: true,
+            totalMarks: true,
+          },
+        },
+      },
+    });
+
+    return c.json(mentors);
+  } catch (error) {
+    console.error("Error fetching mentors and students:", error);
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+});
+
 export default app;
-
-
