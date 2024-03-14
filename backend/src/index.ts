@@ -10,7 +10,46 @@ const app = new Hono<{
 }>();
 app.use("/*", cors());
 
-// Getting assigned students of mentor
+
+// Endpoint to get all students assigned to a mentor
+app.get("/mentors/:id/students", async (c) => {
+  const mentorId = Number(c.req.param("id"));
+
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const mentor = await prisma.mentor.findUnique({
+      where: { id: Number(mentorId) },
+      include: {
+        students: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            ideation: true,
+            execution: true,
+            viva: true,
+            totalMarks: true,
+          },
+        },
+      },
+    });
+
+    if (!mentor) {
+      c.status(404);
+      return c.json({ error: "Mentor not found" });
+    }
+
+    return c.json(mentor.students);
+  } catch (error) {
+    console.error("Error fetching students for mentor:", error);
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+});
+
 
 // Assigning mentors to students.
 app.post("/mentors/assign", async (c) => {
@@ -94,7 +133,7 @@ app.get("/students/unassigned", async (c) => {
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
   const unassignedStudents = await prisma.student.findMany({
-    where: { mentorId: null || undefined },
+    where: { mentorId: null },
   });
   return c.json(unassignedStudents);
 });
@@ -133,24 +172,30 @@ app.post("/mentors", async (c) => {
 // add students
 
 app.post("/students", async (c) => {
-  const body = await c.req.json();
+  try {
+    const body = await c.req.json();
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
 
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate());
+    const student = await prisma.student.create({
+      data: {
+        name: body.name,
+        email: body.email,
+        mentorId: body.mentorId,
+      }
+    });
 
-  const student = await prisma.student.create({
-    data: {
-      name: body.name,
-      email: body.email,
-      mentorId: body.mentorId || null,
-    },
-  });
-
-  return c.json(student);
+    return c.json(student);
+  } catch (e) {
+    console.error(e);
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
 });
 
-// Endpoint to fetch all mentors and their associated students with all details
+
+// Endpoint to fetch all mentor details
 app.get("/mentors/all", async (c) => {
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
@@ -180,5 +225,33 @@ app.get("/mentors/all", async (c) => {
     return c.json({ error: "Internal server error" });
   }
 });
+
+// Endpoint to fetch all student details
+app.get("/students/all", async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const students = await prisma.student.findMany({
+      include: {
+        mentor: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return c.json(students);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    c.status(500);
+    return c.json({ error: "Internal server error" });
+  }
+});
+
 
 export default app;

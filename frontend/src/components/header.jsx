@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"
 import {
   Navbar,
   Collapse,
@@ -13,12 +14,12 @@ function NavList() {
       <Typography
         as="li"
         variant="small"
-        color="blue-gray"
+        color="black"
         className="p-1 font-medium"
       >
-        <a href="#" className="flex items-center hover:text-blue-500 transition-colors">
-          View Mentors
-        </a>
+        <Link to={'/students/all'} className="flex items-center  text-blue-500 transition-colors">
+        View Students
+        </Link>
       </Typography>
       <Typography
         as="li"
@@ -26,9 +27,9 @@ function NavList() {
         color="blue-gray"
         className="p-1 font-medium"
       >
-        <a href="#" className="flex items-center hover:text-blue-500 transition-colors">
-          View Students
-        </a>
+        <Link to={'/mentors/all'} className="flex items-center  text-blue-500 transition-colors">
+        View Mentor
+        </Link>
       </Typography>
       <Typography
         as="li"
@@ -36,15 +37,15 @@ function NavList() {
         color="blue-gray"
         className="p-1 font-medium"
       >
-        <a href="#" className="flex items-center hover:text-blue-500 transition-colors">
-          Login/Signup
+        <a href="#" className="flex items-center text-blue-500 transition-colors">
+          LoginSignup
         </a>
       </Typography>
     </ul>
   );
 }
  
-export function NavbarSimple() {
+export  function NavbarSimple() {
   const [openNav, setOpenNav] = React.useState(false);
  
   const handleWindowResize = () =>
@@ -67,7 +68,7 @@ export function NavbarSimple() {
           variant="h6"
           className="mr-4 cursor-pointer py-1.5"
         >
-         <h2>Dashboard App - Mentor View</h2>
+         <h2 className="text-blue-500">Dashboard App - Mentor View</h2>
         </Typography>
         <div className="hidden lg:block">
           <NavList />
