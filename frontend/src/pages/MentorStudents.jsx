@@ -3,9 +3,13 @@ import { useParams } from 'react-router-dom';
 import StudentDetails from './../components/todisplaystudentdetails.jsx';
 import { NavbarSimple as Header } from '../components/header.jsx';
 import UStudents from './seeunassigned.jsx';
+import Lock from './../components/lockcomponent.jsx';
+import Print from './../components/print.jsx';
 const MentorStudents = () => {
-  const { id } = useParams();
+  const { id  } = useParams();
   const [students, setStudents] = useState([]);
+  const [assignedStudents, setAssignedStudents] = useState([]);
+
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -25,15 +29,17 @@ const MentorStudents = () => {
   }, [id]);
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center">
       <Header />
       {students.map(student => (
         <StudentDetails key={student.id} name={student.name} id={student.id} />
-      
       ))}
-      <UStudents></UStudents>
+      <Lock mentorId={id} />
+      <Print mentorId={id}/>
+      <UStudents mentorId={id} />
     </div>
   );
+  
 };
 
 export default MentorStudents;

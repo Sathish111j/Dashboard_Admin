@@ -53,39 +53,37 @@ app.get("/mentors/:id/students", async (c) => {
 
 // Assigning mentors to students.
 app.post("/mentors/assign", async (c) => {
-  const { mentorId, studentId } = await c.req.json();
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate());
-
-  // Check if the mentor already has 4 students
-  const mentor = await prisma.mentor.findUnique({
-    where: { id: Number(mentorId) },
-    include: { students: true },
-  });
-
-  if (mentor && mentor.students.length >= 4) {
-    c.status(400);
-    return c.json({ error: "Mentor can't accommodate more students." });
+  try {
+    const { mentorId, studentId } = await c.req.json();
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+  
+    // Check if the mentor already has 4 students
+    const mentor = await prisma.mentor.findUnique({
+      where: { id: Number(mentorId) },
+      include: { students: true },
+    });
+  
+    if (mentor && mentor.students.length >= 4) {
+      c.status(400);
+      return c.json({ error: "Mentor can't accommodate more students." });
+    }
+  
+    // Assign the student to the mentor
+    const updatedStudent = await prisma.student.update({
+      where: { id: Number(studentId) },
+      data: { mentorId: Number(mentorId) },
+    });
+  
+    return c.json(updatedStudent);
+  } catch (error) {
+    console.error("Error assigning mentor to student:", error);
+    c.status(500);
+    return c.json({ error: "Internal server error" });
   }
-
-  // Check if the mentor already has the student assigned
-  const alreadyAssigned = mentor?.students.find(
-    (student: { id: number }) => student.id === Number(studentId)
-  );
-  if (alreadyAssigned) {
-    c.status(400);
-    return c.json({ error: "Student is already assigned to this mentor." });
-  }
-
-  // Assign the student to the mentor
-  const updatedStudent = await prisma.student.update({
-    where: { id: Number(studentId) },
-    data: { mentorId: Number(mentorId) },
-  });
-
-  return c.json(updatedStudent);
 });
+
 
 // Unassigning mentors from students.
 
@@ -96,35 +94,36 @@ app.post("/mentors/unassign", async (c) => {
   }).$extends(withAccelerate());
   const updatedStudent = await prisma.student.update({
     where: { id: Number(studentId) },
-    data: { mentorId: null || undefined },
+    data: { mentorId: null },
   });
   return c.json(updatedStudent);
 });
 
 // Updating marks for students.
 
-app.post("/students/marks", async (c) => {
-  const { studentId, ideation, execution, viva } = await c.req.json();
-  const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
-  }).$extends(withAccelerate());
-  const student = await prisma.student.findUnique({
-    where: { id: Number(studentId) },
-    select: { ideation: true, execution: true, viva: true },
-  });
+app.post("/marks", async (c) => {
+  try {
+    const { studentId, ideation, execution, viva } = await c.req.json();
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
 
-  const totalMarks =
-    (ideation || student?.ideation || 0) +
-    (execution || student?.execution || 0) +
-    (viva || student?.viva || 0);
 
-  const updatedStudent = await prisma.student.update({
-    where: { id: Number(studentId) },
-    data: { ideation, execution, viva, totalMarks },
-  });
+    const totalMarks =ideation+ execution+viva 
 
-  return c.json(updatedStudent);
+    const updatedStudent = await prisma.student.update({
+      where: { id: Number(studentId) },
+      data: { ideation, execution, viva, totalMarks },
+    });
+
+    return c.json(updatedStudent);
+  } catch (error) {
+    console.error("Error updating marks:", error);
+    c.status(500);
+    return c.json({ error });
+  }
 });
+
 
 // gets all unassigned students
 
@@ -139,8 +138,8 @@ app.get("/students/unassigned", async (c) => {
 });
 
 // send total marks
-app.post("/students/totalMarks", async (c) => {
-  const { studentId } = await c.req.json();
+app.get("/students/totalMarks/:id", async (c) => {
+  const studentId = Number(c.req.param("id"));
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
   }).$extends(withAccelerate());
@@ -150,6 +149,7 @@ app.post("/students/totalMarks", async (c) => {
   });
   return c.json(student?.totalMarks || 0);
 });
+
 
 //add mentors
 app.post("/mentors", async (c) => {

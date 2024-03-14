@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@prisma/extension-accelerate": "^1.0.0",
+    "axios": "^1.6.7",
     "hono": "^4.1.0",
     "prisma": "^5.11.0"
   },
