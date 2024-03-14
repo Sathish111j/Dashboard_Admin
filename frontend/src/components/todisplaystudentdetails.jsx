@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const StudentDetails = ({ name, id }) => {
+const StudentDetails = ({ name, id, setStudents, mentorId, isLocked }) => {
   const [subject1Marks, setSubject1Marks] = useState(0);
   const [subject2Marks, setSubject2Marks] = useState(0);
   const [subject3Marks, setSubject3Marks] = useState(0);
@@ -20,7 +20,7 @@ const StudentDetails = ({ name, id }) => {
       .then((response) => response.json())
       .then((data) => setTotalMarks(data))
       .catch((error) => console.error("Error fetching total marks:", error));
-  }, [id]);
+  }, [id, subject1Marks, subject2Marks, subject3Marks]);
 
   const handleEnterMarks = async () => {
     try {
@@ -34,6 +34,12 @@ const StudentDetails = ({ name, id }) => {
         }
       );
       console.log("Marks entered successfully:", response.data);
+  
+      // Fetch the updated total marks after marks are entered
+      fetch(`https://backend.sathish333j.workers.dev/students/totalMarks/${id}`)
+        .then((response) => response.json())
+        .then((data) => setTotalMarks(data))
+        .catch((error) => console.error("Error fetching total marks:", error));
     } catch (error) {
       console.error("Error entering marks:", error);
     }
@@ -48,6 +54,15 @@ const StudentDetails = ({ name, id }) => {
         }
       );
       console.log("Student unassigned successfully.");
+  
+      // Fetch the updated list of assigned students
+      const response = await fetch(`https://backend.sathish333j.workers.dev/mentors/${mentorId}/students`);
+      if (response.ok) {
+        const data = await response.json();
+        setStudents(data);
+      } else {
+        throw new Error('Failed to fetch data');
+      }
     } catch (error) {
       console.error("Error unassigning student:", error);
     }
@@ -123,6 +138,7 @@ const StudentDetails = ({ name, id }) => {
             onClick={handleEnterMarks}
             type="button"
             className="bg-green-500 text-white py-2 px-4 rounded-md ml-4"
+            disabled={isLocked}
           >
             Enter
           </button>

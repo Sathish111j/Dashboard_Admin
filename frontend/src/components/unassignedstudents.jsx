@@ -1,26 +1,31 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const UserInfoCardtoassign = ({ name, email, id ,mentorId}) => {
-    const [errorMessage, setErrorMessage] = useState(null);
-
-    const handleAddButtonClick = async () => {
-        try {
-            const response = await axios.post(
-                "https://backend.sathish333j.workers.dev/mentors/assign",
-                {
-                    mentorId: mentorId,
-                    studentId: id
-                }
-            );
-            console.log("Student assigned successfully:", response.data);
-            
-        } catch (error) {
-            console.error("Error assigning student:", error);
-            setErrorMessage("Error assigning student. Please try again.");
-            
+const UserInfoCardtoassign = ({ name, email, id, mentorId, setUnassignedStudents }) => {
+  const handleAddButtonClick = async () => {
+    try {
+      const response = await axios.post(
+        "https://backend.sathish333j.workers.dev/mentors/assign",
+        {
+          mentorId: mentorId,
+          studentId: id
         }
-    };
+      );
+      console.log("Student assigned successfully:", response.data);
+
+      // Update the list of unassigned students
+      if (setUnassignedStudents) {
+        const unassignedResponse = await fetch('https://backend.sathish333j.workers.dev/students/unassigned');
+        if (!unassignedResponse.ok) {
+          throw new Error('Failed to fetch unassigned students');
+        }
+        const unassignedData = await unassignedResponse.json();
+        setUnassignedStudents(unassignedData);
+      }
+    } catch (error) {
+      console.error("Error assigning student:", error);
+    }
+  };
 
     return (
         <>

@@ -1,34 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import UserInfoCardtoassign from './../components/unassignedstudents.jsx';
-const UnassignedStudentsList = ({ mentorId }) => {
-    const [students, setStudents] = useState([]);
-
-    useEffect(() => {
-        fetch('https://backend.sathish333j.workers.dev/students/unassigned')
-            .then(response => response.json())
-            .then(data => setStudents(data))
-            .catch(error => console.error('Error fetching unassigned students:', error));
-    }, []);
-
-
-
+const UStudents = ({ mentorId, setUnassignedStudents,unassignedStudents }) => {
     return (
-        <>
-            <h2 className="flex justify-center items-center p-2">Unassigned Students </h2>
-            <div className="flex flex-row justify-center items-center p-2 ">
-                {students.map(student => (
-                    <UserInfoCardtoassign
-                    key={student.id}
-                    id={student.id}
-                    name={student.name}
-                    email={student.email}
-                    mentorId={mentorId}
-                   
-                  />
-                ))}
-            </div>
-        </>
-    );
-};
+      <div>
+        <h2 class="text-2xl font-bold mb-4 text-center">Unassigned Students</h2>
 
-export default UnassignedStudentsList;
+        {unassignedStudents.map((student) => (
+          <UserInfoCardtoassign
+            key={student.id}
+            name={student.name}
+            email={student.email}
+            id={student.id}
+            mentorId={mentorId}
+            setUnassignedStudents={setUnassignedStudents}
+          />
+        ))}
+      </div>
+    );
+  };
+
+export default UStudents;
