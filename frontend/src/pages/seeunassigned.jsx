@@ -4,7 +4,7 @@ const UnassignedStudentsList = ({ mentorId }) => {
     const [students, setStudents] = useState([]);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8787/students/unassigned')
+        fetch('https://backend.sathish333j.workers.dev/students/unassigned')
             .then(response => response.json())
             .then(data => setStudents(data))
             .catch(error => console.error('Error fetching unassigned students:', error));

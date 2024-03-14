@@ -5,7 +5,7 @@ const MentorStudentsCheck = ({ mentorId }) => {
   
   const fetchStudents = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8787/mentors/${mentorId}/students`);
+      const response = await fetch(`https://backend.sathish333j.workers.dev/${mentorId}/students`);
       const data = await response.json();
       setStudents(data);
     } catch (error) {

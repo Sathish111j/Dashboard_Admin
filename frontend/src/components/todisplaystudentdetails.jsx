@@ -12,13 +12,13 @@ const StudentDetails = ({ name, email, id }) => {
     if (value >= 0 && value <= 10) {
       setter(value);
     } else {
-      setter(0); // Resetting to 0 if value is not within range
+      setter(0); 
     }
   };
   
   
   useEffect(() => {
-    fetch(`http://127.0.0.1:8787/students/totalMarks/${id}`)
+    fetch(`https://backend.sathish333j.workers.dev/students/totalMarks/${id}`)
       .then(response => response.json())
       .then(data => setTotalMarks(data))
       .catch(error => console.error('Error fetching mentors:', error));
@@ -27,7 +27,7 @@ const StudentDetails = ({ name, email, id }) => {
   const handleEnterMarks = async () => {
     try {
       const response = await axios.post(
-        `http://127.0.0.1:8787/marks`,
+        `https://backend.sathish333j.workers.dev/marks`,
         {
           studentId: id,
           ideation: subject1Marks,
@@ -36,26 +36,26 @@ const StudentDetails = ({ name, email, id }) => {
         }
       );
       console.log("Marks entered successfully:", response.data);
-      // Handle any further actions after successfully entering marks
+
     } catch (error) {
       console.error("Error entering marks:", error);
-      // Handle errors
+  
     }
   };
 
   const handleRemove = async () => {
   try {
     await axios.post(
-      "http://127.0.0.1:8787/mentors/unassign",
+      "https://backend.sathish333j.workers.dev/mentors/unassign",
       {
         studentId: id
       }
     );
     console.log("Student unassigned successfully.");
-    // Perform any further actions after successful removal
+
   } catch (error) {
     console.error("Error unassigning student:", error);
-    // Handle errors
+
   }
 };
 
@@ -128,8 +128,8 @@ const StudentDetails = ({ name, email, id }) => {
               ) : null}
             </div>
             <button
-              onClick={handleEnterMarks} // Call handleEnterMarks function on button click
-              type="button" // Specify type as button to prevent form submission
+              onClick={handleEnterMarks} 
+              type="button"
               className="bg-green-500 text-white py-3 px-3 rounded-md m-5"
             >
               Enter

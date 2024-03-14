@@ -5,7 +5,7 @@ const MentorInfo = () => {
   const [mentors, setMentors] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8787/students/all')
+    fetch('https://backend.sathish333j.workers.dev/students/all')
       .then(response => response.json())
       .then(data => setMentors(data))
       .catch(error => console.error('Error fetching mentors:', error));

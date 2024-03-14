@@ -14,7 +14,7 @@ const MentorStudents = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8787/mentors/${id}/students`);
+        const response = await fetch(`https://backend.sathish333j.workers.dev/mentors/${id}/students`);
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

@@ -7,18 +7,18 @@ const UserInfoCardtoassign = ({ name, email, id ,mentorId}) => {
     const handleAddButtonClick = async () => {
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8787/mentors/assign",
+                "https://backend.sathish333j.workers.dev/mentors/assign",
                 {
                     mentorId: mentorId,
                     studentId: id
                 }
             );
             console.log("Student assigned successfully:", response.data);
-            // Perform any further actions after successful assignment
+            
         } catch (error) {
             console.error("Error assigning student:", error);
             setErrorMessage("Error assigning student. Please try again.");
-            // Handle errors
+            
         }
     };
 
