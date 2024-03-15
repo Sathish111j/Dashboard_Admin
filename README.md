@@ -26,4 +26,4 @@ This is a complete mentor-view solution for the evaluation of students for a sem
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo-url.git
+   [git clone https://github.com/your-repo-url.git](https://github.com/Sathish111j/Dashboard_Admin.git)https://github.com/Sathish111j/Dashboard_Admin.git
