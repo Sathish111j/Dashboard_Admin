@@ -1,93 +1,83 @@
-import React from "react";
-import { Link } from "react-router-dom"
-import {
-  Navbar,
-  Collapse,
-  Typography,
-  IconButton,
-} from "@material-tailwind/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
- 
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
 function NavList() {
   return (
     <ul className="my-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
-      <Typography
-        as="li"
-        variant="small"
-        color="black"
-        className="p-1 font-medium"
-      >
-        <Link to={'/students/all'} className="flex items-center  text-blue-500 transition-colors">
-        View Students
+      <li>
+        <Link to={"/students/all"} className="text-white hover:text-gray-300 transition-colors">
+          View Students
         </Link>
-      </Typography>
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="p-1 font-medium"
-      >
-        <Link to={'/mentors/all'} className="flex items-center  text-blue-500 transition-colors">
-        View Mentor
+      </li>
+      <li>
+        <Link to={"/mentors/all"} className="text-white hover:text-gray-300 transition-colors">
+          View Mentor
         </Link>
-      </Typography>
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="p-1 font-medium"
-      >
-        <a href="#" className="flex items-center text-blue-500 transition-colors">
-          LoginSignup
+      </li>
+      <li>
+        <a href="#" className="text-white hover:text-gray-300 transition-colors">
+          Login/Signup
         </a>
-      </Typography>
+      </li>
     </ul>
   );
 }
- 
-export  function NavbarSimple() {
-  const [openNav, setOpenNav] = React.useState(false);
- 
-  const handleWindowResize = () =>
-    window.innerWidth >= 960 && setOpenNav(false);
- 
-  React.useEffect(() => {
-    window.addEventListener("resize", handleWindowResize);
- 
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, []);
- 
+
+export function NavbarSimple() {
+  const [openNav, setOpenNav] = useState(false);
+
   return (
-    <Navbar className="mx-auto max-w-screen-xl px-6 py-3">
-      <div className="flex items-center justify-between text-blue-gray-900">
-        <Typography
-          as="a"
-          href="#"
-          variant="h6"
-          className="mr-4 cursor-pointer py-1.5"
-        >
-         <h2 className="text-blue-500">Dashboard App - Mentor View</h2>
-        </Typography>
-        <div className="hidden lg:block">
+    <div className="bg-black text-white py-4 w-full">
+      <div className="container mx-auto flex items-center justify-between">
+        <h2 className="text-lg font-semibold">
+          <Link to={"/"} className="text-white">
+            Dashboard App - Mentor View
+          </Link>
+        </h2>
+        <div className="lg:hidden">
+          <button
+            className="menu-icon"
+            onClick={() => setOpenNav(!openNav)}
+            aria-label="Toggle Navigation"
+          >
+            <svg
+              className="w-6 h-6 fill-current"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {openNav ? (
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm16 7H4v-2h16v2z"
+                />
+              ) : (
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M4 6h16v2H4V6zm0 7h16v2H4v-2zm0 7h16v2H4v-2z"
+                />
+              )}
+            </svg>
+          </button>
+        </div>
+        <div className="hidden lg:flex">
           <NavList />
         </div>
-        <IconButton
-          variant="text"
-          className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
-          ripple={false}
-          onClick={() => setOpenNav(!openNav)}
-        >
-          {openNav ? (
-            <XMarkIcon className="h-6 w-6" strokeWidth={2} />
-          ) : (
-            <Bars3Icon className="h-6 w-6" strokeWidth={2} />
-          )}
-        </IconButton>
       </div>
-      <Collapse open={openNav}>
-      </Collapse>
-    </Navbar>
+      {openNav && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-50"
+          onClick={() => setOpenNav(false)}
+        ></div>
+      )}
+      {openNav && (
+        <div className="lg:hidden absolute top-0 left-0 w-full bg-black z-50">
+          <div className="container mx-auto py-4">
+            <NavList />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

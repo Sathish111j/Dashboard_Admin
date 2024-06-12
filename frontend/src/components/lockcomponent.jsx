@@ -25,7 +25,9 @@ const Lock = ({ students, isLocked, setIsLocked }) => {
   return (
     <div>
       <button
-        className="flex items-center justify-center bg-red-500 text-white py-3 px-3 rounded-md m-5"
+        className={`flex items-center justify-center ${
+          isLocked ? 'bg-gray-500 text-white' : 'bg-black text-white'
+        } py-3 px-3 rounded-md m-5`}
         onClick={handleButtonClick}
       >
         {isLocked ? 'Unlock Marks' : 'Lock Marks'}

@@ -11,46 +11,57 @@ const MentorStudents = () => {
   const [students, setStudents] = useState([]);
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
+  const [marksUpdated, setMarksUpdated] = useState(false); 
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchAssignedStudents = async () => {
       try {
-        const response = await fetch(`https://backend.sathish333j.workers.dev/mentors/${id}/students`);
-        if (!response.ok) {
+        const assignedResponse = await fetch(`https://dashboardbackend.sathish333j.workers.dev/mentors/${id}/students`);
+        if (!assignedResponse.ok) {
           throw new Error('Failed to fetch assigned students');
         }
-        const assignedStudents = await response.json();
+        const assignedStudents = await assignedResponse.json();
         setStudents(assignedStudents);
-  
-        const unassignedResponse = await fetch('https://backend.sathish333j.workers.dev/students/unassigned');
+      } catch (error) {
+        console.error('Error fetching assigned students:', error);
+      }
+    };
+
+    fetchAssignedStudents();
+
+    // No need to return a cleanup function since we're not setting up any ongoing processes
+  }, [id, unassignedStudents, isLocked, marksUpdated]);
+
+  useEffect(() => {
+    const fetchUnassignedStudents = async () => {
+      try {
+        const unassignedResponse = await fetch('https://dashboardbackend.sathish333j.workers.dev/students/unassigned');
         if (!unassignedResponse.ok) {
           throw new Error('Failed to fetch unassigned students');
         }
         const unassignedData = await unassignedResponse.json();
         setUnassignedStudents(unassignedData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching unassigned students:', error);
       }
     };
-  
-    fetchStudents();
-  
-    return () => {
-      fetchStudents();
-    };
-  }, [id,students,isLocked]);
+
+    fetchUnassignedStudents();
+
+    // No need to return a cleanup function since we're not setting up any ongoing processes
+  }, [students.length, isLocked, marksUpdated]); // Only fetch unassigned students when the number of assigned students changes
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center  bg-gray-900 text-white min-h-screen">
       <Header />
       {students.map(student => (
-        <StudentDetails key={student.id} name={student.name} id={student.id} mentorId={id} setStudents={setStudents} isLocked={ isLocked} />
+        <StudentDetails key={student.id} name={student.name} id={student.id} mentorId={id} setStudents={setStudents} isLocked={isLocked} setMarksUpdated={setMarksUpdated} />
       ))}
       <Lock students={students} isLocked={isLocked} setIsLocked={setIsLocked} />
       <br />
-      <Print students={students} />
+      <Print students={students} marksUpdated={marksUpdated} />
       <br />
-      <UStudents mentorId={id} setUnassignedStudents={setUnassignedStudents} unassignedStudents={ unassignedStudents} />
+      <UStudents mentorId={id} setUnassignedStudents={setUnassignedStudents} unassignedStudents={unassignedStudents} />
     </div>
   );
 };

@@ -12,7 +12,7 @@ const StudentTable = ({ students }) => {
 
   const handleDownloadPdf = () => {
     const doc = new jsPDF();
-    doc.text("Student Details", 10, 10);
+    doc.text('Student Details', 10, 10);
     doc.autoTable({ html: '#student-table' });
     doc.save('student-details.pdf');
   };
@@ -20,10 +20,10 @@ const StudentTable = ({ students }) => {
   return (
     <div className="overflow-x-auto">
       <div className="flex justify-between mb-4">
-        <h2 className="text-lg font-semibold">Student Details</h2>
+        <h2 className="text-lg font-semibold text-white">Student Details</h2>
         <div>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded mr-2" onClick={handlePrint}>Print</button>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded" onClick={handleDownloadPdf}>Download PDF</button>
+          <button className="bg-black hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded mr-2" onClick={handlePrint}>Print</button>
+          <button className="bg-black hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded" onClick={handleDownloadPdf}>Download PDF</button>
         </div>
       </div>
       <table id="student-table" className="min-w-full divide-y divide-gray-200" ref={componentRef}>
@@ -41,13 +41,13 @@ const StudentTable = ({ students }) => {
         <tbody className="bg-white divide-y divide-gray-200">
           {students.map((student) => (
             <tr key={student.id}>
-              <td className="px-6 py-4 whitespace-nowrap">{student.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.ideation}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.execution}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.viva}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{student.totalMarks}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.name}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.email}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.ideation}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.execution}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.viva}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-black">{student.totalMarks}</td>
             </tr>
           ))}
         </tbody>
