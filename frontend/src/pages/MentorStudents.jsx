@@ -11,7 +11,7 @@ const MentorStudents = () => {
   const [students, setStudents] = useState([]);
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
-  const [marksUpdated, setMarksUpdated] = useState(false); 
+  const [marksUpdated, setMarksUpdated] = useState(false);
 
   useEffect(() => {
     const fetchAssignedStudents = async () => {
@@ -28,8 +28,6 @@ const MentorStudents = () => {
     };
 
     fetchAssignedStudents();
-
-    // No need to return a cleanup function since we're not setting up any ongoing processes
   }, [id, unassignedStudents, isLocked, marksUpdated]);
 
   useEffect(() => {
@@ -47,16 +45,39 @@ const MentorStudents = () => {
     };
 
     fetchUnassignedStudents();
-
-    // No need to return a cleanup function since we're not setting up any ongoing processes
-  }, [students.length, isLocked, marksUpdated]); // Only fetch unassigned students when the number of assigned students changes
+  }, [students.length, isLocked, marksUpdated]);
 
   return (
-    <div className="flex flex-col items-center  bg-gray-900 text-white min-h-screen">
+    <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen">
       <Header />
-      {students.map(student => (
-        <StudentDetails key={student.id} name={student.name} id={student.id} mentorId={id} setStudents={setStudents} isLocked={isLocked} setMarksUpdated={setMarksUpdated} />
-      ))}
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full bg-gray-800 text-white">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">ID</th>
+              <th className="px-4 py-2">Ideation</th>
+              <th className="px-4 py-2">Execution</th>
+              <th className="px-4 py-2">Viva/Pitch</th>
+              <th className="px-4 py-2">Total Marks</th>
+              <th className="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map(student => (
+              <StudentDetails
+                key={student.id}
+                name={student.name}
+                id={student.id}
+                mentorId={id}
+                setStudents={setStudents}
+                isLocked={isLocked}
+                setMarksUpdated={setMarksUpdated}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
       <Lock students={students} isLocked={isLocked} setIsLocked={setIsLocked} />
       <br />
       <Print students={students} marksUpdated={marksUpdated} />
